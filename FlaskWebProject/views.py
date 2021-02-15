@@ -50,6 +50,7 @@ def post(id):
     form = PostForm(formdata=request.form, obj=post)
     if form.validate_on_submit():
         post.save_changes(form, request.files['image_path'], current_user.id)
+        app.logger.info('INFO: saved the blog details')
         return redirect(url_for('home'))
     return render_template(
         'post.html',
@@ -61,12 +62,14 @@ def post(id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
+        app.logger.warning('WARNING: User logged in!')
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
+            app.logger.error('ERROR: Entered Invalid username and password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -102,6 +105,7 @@ def logout():
     logout_user()
     if session.get("user"): # Used MS Login
         # Wipe out user and its token cache from session
+        app.logger.warning('WARNING: USER logged out!')
         session.clear()
         # Also logout from your tenant's web session
         return redirect(
