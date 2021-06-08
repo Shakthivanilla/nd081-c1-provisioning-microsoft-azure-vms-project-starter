@@ -50,7 +50,7 @@ def post(id):
     form = PostForm(formdata=request.form, obj=post)
     if form.validate_on_submit():
         post.save_changes(form, request.files['image_path'], current_user.id)
-        app.logger.error('INFO: saved the blog details')
+        app.logger.info('INFO: saved the blog details')
         return redirect(url_for('home'))
     return render_template(
         'post.html',
@@ -62,7 +62,7 @@ def post(id):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        app.logger.error('USER LOGGED IN!')
+        app.logger.info('USER LOGGED IN!')
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
@@ -105,7 +105,7 @@ def logout():
     logout_user()
     if session.get('user'): # Used MS Login
         # Wipe out user and its token cache from session
-        app.logger.error('USER LOGGED OUT!')
+        app.logger.info('USER LOGGED OUT!')
         session.clear()
         # Also logout from your tenant's web session
         return redirect(Config.AUTHORITY + '/oauth2/v2.0/logout' + '?post_logout_redirect_uri=' + url_for('login', _external=True))
